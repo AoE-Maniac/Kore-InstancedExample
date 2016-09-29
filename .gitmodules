@@ -1,0 +1,4 @@
+[submodule "Kore"]
+	path = Kore
+	url = https://github.com/KTXSoftware/Kore
+	branch = master
