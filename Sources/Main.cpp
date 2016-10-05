@@ -24,6 +24,8 @@ namespace {
 
 	float* instancePositions;
 	float* instanceYOffsets;
+	float* instanceAmp;
+	float* instancePhase;
 
 	Shader* vertexShader;
 	Shader* fragmentShader;
@@ -48,7 +50,7 @@ namespace {
 		for (int i = 0; i < INSTANCES; ++i) {
 			// Update height value
 			int offsetPosition = i * 3;
-			instanceYOffsets[i] = Kore::sin(instancePositions[offsetPosition] * 4 + instancePositions[offsetPosition + 2] + System::time() * 2) / 4;
+			instanceYOffsets[i] = instanceAmp[i] * Kore::sin(instancePositions[offsetPosition] * 4 + instancePositions[offsetPosition + 2] + System::time() * 2 * instancePhase[i]) / 4;
 
 			// Calculate new model matrix
 			mat4 m = mat4::Translation(
@@ -236,13 +238,19 @@ int kore(int argc, char** argv) {
 	// Initialize data, not relevant for rendering
 	instancePositions = new float[INSTANCES * 3];
 	instanceYOffsets = new float[INSTANCES];
+	instanceAmp = new float[INSTANCES];
+	instancePhase = new float[INSTANCES];
 	for (int x = 0; x < INSTANCES_X; ++x) {
 		for (int z = 0; z < INSTANCES_Z; ++z) {
 			// Span x/z grid, center on 0/0
-			int offset = 3 * (x * INSTANCES_X + z);
+			int i = (x * INSTANCES_X + z);
+			int offset = 3 * i;
 			instancePositions[offset    ] = x - ((float) INSTANCES_X - 1) / 2;
 			instancePositions[offset + 1] = 0;
 			instancePositions[offset + 2] = z - ((float) INSTANCES_Z - 1) / 2;
+			
+			instanceAmp[i] = 1 + (float) Kore::Random::get(-25, 25) / 100;
+			instancePhase[i] = 1 + (float) Kore::Random::get(-25, 25) / 100;
 		}
 	}
 
